@@ -1,0 +1,45 @@
+<div class="home-container">
+  <div class="search-container">
+    <input type="text" (keyup.enter)="searchCity($event)" placeholder="Search city..." />
+    <i class="search-icon" (click)="getCurrentLocation()">🔍</i>
+  </div>
+
+  <h6 class="error-message" *ngIf="error">{{ error }}</h6>
+
+  <div class="weather-card" *ngIf="!error">
+    <div class="header">
+      <h1>Weather Forecast</h1>
+    </div>
+
+    <div class="weather-content">
+      <div class="current-weather">
+        <h2>{{ currentWeather?.name }}</h2>
+        <p class="description">{{ currentWeather?.weather[0]?.description }}</p>
+        <h3 class="temperature">
+          <img [src]="'http://openweathermap.org/img/w/' + currentWeather?.weather[0]?.icon + '.png'" alt="Weather icon">
+          {{ currentWeather?.main?.temp }}°C
+        </h3>
+        <p>Humidity: {{ currentWeather?.main?.humidity }}%</p>
+        <p>Wind Speed: {{ currentWeather?.wind?.speed }} m/s</p>
+      </div>
+
+      <cdk-virtual-scroll-viewport #viewport itemSize="100" class="forecast-container" (scrolledIndexChange)="loadMoreForecast()">
+        <div *ngFor="let forecast of displayedForecast" class="forecast-item">
+          <p>
+            <img 
+            [src]="'http://openweathermap.org/img/w/' + forecast.weather[0].icon + '.png'" 
+            alt="Weather icon"
+            class="forecast-icon"
+          />
+            {{ forecast.dt * 1000 | date: 'MMM dd, hh:mm a' }}</p>
+          <p>{{ forecast.main.temp }}°C</p>
+        </div>
+          
+        <div class="loading-spinner" *ngIf="loadingMore">Loading more...</div>
+      
+      </cdk-virtual-scroll-viewport>
+    </div>
+  </div>
+
+
+</div>
