@@ -3,7 +3,7 @@ import { WeatherService } from './services/weather.service';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 @Component({
-  selector: 'app-home',
+  selector: 'app-home', 
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
