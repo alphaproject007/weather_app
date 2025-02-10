@@ -1,9 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { WeatherService } from './services/weather.service';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-home', 
+  selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
@@ -14,17 +16,27 @@ export class HomeComponent implements OnInit {
   currentWeather: any;
   forecast: any[] = [];
   displayedForecast: any[] = [];
-  city: string = 'Bangalore'; 
+  city: string = 'Bangalore';
   error = '';
   loading: boolean = false;
   loadingMore: boolean = false;
   batchSize = 6;
   forecastIndex = 0;
 
+  private searchSubject = new Subject<string>(); 
+
   constructor(private weatherService: WeatherService) {}
 
   ngOnInit(): void {
     this.getCurrentLocation();
+
+    this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe((city) => {
+      this.city = city;
+      this.fetchWeather();
+    });
   }
 
   getCurrentLocation(): void {
@@ -45,7 +57,7 @@ export class HomeComponent implements OnInit {
   }
 
   fetchWeatherByCoords(lat: number, lon: number): void {
-    this.loading = true; 
+    this.loading = true;
     this.weatherService.getWeatherByCoords(lat, lon).subscribe(
       (weather) => {
         this.currentWeather = weather;
@@ -79,7 +91,7 @@ export class HomeComponent implements OnInit {
   }
 
   fetchForecast(): void {
-    this.loading = true; 
+    this.loading = true;
     this.weatherService.getForecast(this.city).subscribe(
       (data) => {
         this.forecast = data.list || [];
@@ -108,11 +120,7 @@ export class HomeComponent implements OnInit {
   searchCity(event: any): void {
     const newCity = event.target.value.trim();
     if (newCity) {
-      this.city = newCity;
-      setTimeout(() => {
-        this.virtualScroll?.scrollToIndex(0);
-      }, 100);
-      this.fetchWeather();
+      this.searchSubject.next(newCity);
     } else {
       this.clearWeatherData('Please enter a valid city name');
     }

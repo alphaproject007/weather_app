@@ -1,7 +1,6 @@
 <div class="home-container">
   <div class="search-container">
-    <input type="text" (keyup.enter)="searchCity($event)" placeholder="Search city..." />
-    <i class="search-icon" (click)="getCurrentLocation()">🔍</i>
+    <input type="text" (keyup)="searchCity($event)" placeholder="Search city..." />
   </div>
 
   <h6 class="error-message" *ngIf="error">{{ error }}</h6>
@@ -40,6 +39,4 @@
       </cdk-virtual-scroll-viewport>
     </div>
   </div>
-
-
 </div>
